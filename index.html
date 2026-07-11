@@ -1084,3 +1084,52 @@
 
 </body>
 </html>
+  // ===== MUSIC PLAYER =====
+  const music = document.getElementById('bgMusic');
+  const disc = document.getElementById('musicDisc');
+  const visualizer = document.getElementById('visualizer');
+  let isPlaying = false;
+
+  music.volume = 0.6;
+
+  // ฟังก์ชันสลับสถานะ เล่น/หยุด
+  function togglePlay() {
+    if (isPlaying) {
+      music.pause();
+      disc.classList.remove('playing');
+      visualizer.classList.remove('active');
+    } else {
+      music.play().then(() => {
+        disc.classList.add('playing');
+        visualizer.classList.add('active');
+      }).catch(err => {
+        console.log('Playback blocked:', err);
+      });
+    }
+    isPlaying = !isPlaying;
+  }
+
+  // คลิกที่แผ่นดิสก์เพื่อเปิด/ปิด
+  disc.addEventListener('click', togglePlay);
+
+  // ดักจับการคลิกครั้งแรกในหน้าเว็บเพื่อช่วยกดเล่นอัตโนมัติ (แก้ปัญหา Browser บล็อก)
+  let autoPlayAttempted = false;
+  const tryAutoPlay = () => {
+    if (!autoPlayAttempted && !isPlaying) {
+      music.play().then(() => {
+        isPlaying = true;
+        disc.classList.add('playing');
+        visualizer.classList.add('active');
+      }).catch((err) => {
+        console.log("Autoplay ยังหวังผลไม่ได้จนกว่าจะคลิกตรงๆ:", err);
+      });
+      autoPlayAttempted = true;
+      // ลบ Event ออกเมื่อพยายามเปิดไปแล้วครั้งแรก
+      document.removeEventListener('click', tryAutoPlay);
+      document.removeEventListener('touchstart', tryAutoPlay);
+    }
+  };
+
+  // รอให้มีการคลิกหรือทัชตรงไหนก็ได้บนจอก่อน เพลงถึงจะเริ่ม
+  document.addEventListener('click', tryAutoPlay);
+  document.addEventListener('touchstart', tryAutoPlay);
