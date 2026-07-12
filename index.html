@@ -765,7 +765,7 @@
 <div class="dust" id="dust"></div>
 <div class="floating-runes" id="floatingRunes"></div>
 
-<!-- ===== MUSIC PLAYER (Bottom Left) ===== -->
+<!-- ===== MUSIC PLAYER ===== -->
 <div class="music-player">
   <div class="music-disc" id="musicDisc" title="Play / Pause"></div>
   <div class="music-visualizer" id="visualizer">
@@ -776,10 +776,12 @@
     <span style="height:5px"></span>
   </div>
   <div class="music-label">OST</div>
-     <audio id="bgMusic" loop preload="auto">
-    <source src="Eres tú - Peint (youtub..." type="audio/mpeg">
+  <audio id="bgMusic" loop preload="auto">
+    <!-- ดึงไฟล์เพลงตรงๆ จากชื่อไฟล์ในคลัง GitHub ของคุณเรียบร้อยแล้วครับ -->
+    <source src="Eres tú - Peint (youtube.mp3" type="audio/mpeg">
   </audio>
- 
+</div>
+
 <!-- ===== HERO ===== -->
 <section class="hero">
   <div class="hero-ornament">THE WANDERING ANOMALY</div>
@@ -994,7 +996,7 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.form-row, .gallery-item').forEach(el => observer.observe(el));
 
-  // ===== MUSIC PLAYER (แก้ไขระบบแก้บล็อก Autoplay สมบูรณ์แบบ) =====
+  // ===== MUSIC PLAYER (ระบบ Autoplay ปลดล็อกสำหรับ iPad/iOS) =====
   const music = document.getElementById('bgMusic');
   const disc = document.getElementById('musicDisc');
   const visualizer = document.getElementById('visualizer');
@@ -1020,7 +1022,7 @@
 
   disc.addEventListener('click', togglePlay);
 
-  // ปลดล็อกระบบเสียงทันทีเมื่อมีการแตะหรือคลิกจุดใดก็ได้บนหน้าจอครั้งแรก (เหมาะกับ iPad/มือถือ)
+  // ทริกเกอร์ให้เล่นเสียงเมื่อมีการทัชหรือคลิกครั้งแรกบนจอภาพ
   let autoPlayAttempted = false;
   const tryAutoPlay = () => {
     if (!autoPlayAttempted && !isPlaying) {
@@ -1029,7 +1031,7 @@
         disc.classList.add('playing');
         visualizer.classList.add('active');
       }).catch((err) => {
-        console.log('Autoplay รอการคลิกโดยตรง:', err);
+        console.log('Autoplay waiting for touch:', err);
       });
       autoPlayAttempted = true;
       document.removeEventListener('click', tryAutoPlay);
