@@ -306,19 +306,6 @@
     z-index: 2;
     opacity: 0;
     animation: fadeUp 1.4s 0.5s forwards, glowPulse 3s ease-in-out infinite;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-  .hero h1:hover {
-    animation: glitch 0.3s infinite;
-  }
-  @keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
   }
   @keyframes glowPulse {
     0%, 100% { filter: drop-shadow(0 0 30px rgba(255,215,0,0.5)); }
@@ -737,8 +724,6 @@
     .music-disc { width: 65px; height: 65px; }
     .music-label { display: none; }
     .hero h1 { letter-spacing: 4px; }
-    .loading-logo { font-size: 32px; }
-    .loading-bar-container { width: 300px; }
   }
 </style>
 </head>
@@ -765,7 +750,7 @@
 <div class="dust" id="dust"></div>
 <div class="floating-runes" id="floatingRunes"></div>
 
-<!-- ===== MUSIC PLAYER ===== -->
+<!-- ===== MUSIC PLAYER (Bottom Left) ===== -->
 <div class="music-player">
   <div class="music-disc" id="musicDisc" title="Play / Pause"></div>
   <div class="music-visualizer" id="visualizer">
@@ -777,8 +762,9 @@
   </div>
   <div class="music-label">OST</div>
   <audio id="bgMusic" loop preload="auto">
-    <!-- ดึงไฟล์เพลงตรงๆ จากชื่อไฟล์ในคลัง GitHub ของคุณเรียบร้อยแล้วครับ -->
-    <source src="Eres tú - Peint (youtube.mp3" type="audio/mpeg">
+    <!-- แก้ไข URL ให้ตรงกับไฟล์เพลงของคุณ -->
+    <source src="https://drive.google.com/uc?export=download&id=12gPYRMgNlutrXA-8-h7mh0kcvvE42GnG" type="audio/mpeg">
+    Your browser does not support the audio element.
   </audio>
 </div>
 
@@ -996,15 +982,21 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.form-row, .gallery-item').forEach(el => observer.observe(el));
 
-  // ===== MUSIC PLAYER (ระบบ Autoplay ปลดล็อกสำหรับ iPad/iOS) =====
+  // ===== MUSIC PLAYER =====
   const music = document.getElementById('bgMusic');
   const disc = document.getElementById('musicDisc');
   const visualizer = document.getElementById('visualizer');
   let isPlaying = false;
 
+  // แก้ไข URL ให้ตรงกับไฟล์เพลงของคุณ
+  // ตัวอย่าง: ถ้าไฟล์เพลงอยู่ที่ https://example.com/music.mp3
+  // ให้เปลี่ยนเป็น: src="https://example.com/music.mp3"
+  // หรือใช้ Google Drive แบบนี้:
+  // src="https://drive.google.com/uc?export=download&id=FILE_ID"
+
   music.volume = 0.6;
 
-  function togglePlay() {
+  disc.addEventListener('click', () => {
     if (isPlaying) {
       music.pause();
       disc.classList.remove('playing');
@@ -1014,15 +1006,15 @@
         disc.classList.add('playing');
         visualizer.classList.add('active');
       }).catch(err => {
-        console.log('Playback blocked:', err);
+        console.log('Auto-play blocked:', err);
+        // แสดงข้อความแจ้งเตือน
+        alert('เพลงไม่สามารถเล่นได้ในบางเบราว์เซอร์ โปรดคลิกปุ่มเล่นด้วยตนเอง');
       });
     }
     isPlaying = !isPlaying;
-  }
+  });
 
-  disc.addEventListener('click', togglePlay);
-
-  // ทริกเกอร์ให้เล่นเสียงเมื่อมีการทัชหรือคลิกครั้งแรกบนจอภาพ
+  // Try auto-play on first user interaction
   let autoPlayAttempted = false;
   const tryAutoPlay = () => {
     if (!autoPlayAttempted && !isPlaying) {
@@ -1030,17 +1022,12 @@
         isPlaying = true;
         disc.classList.add('playing');
         visualizer.classList.add('active');
-      }).catch((err) => {
-        console.log('Autoplay waiting for touch:', err);
-      });
+      }).catch(() => {});
       autoPlayAttempted = true;
-      document.removeEventListener('click', tryAutoPlay);
-      document.removeEventListener('touchstart', tryAutoPlay);
     }
   };
-
-  document.addEventListener('click', tryAutoPlay);
-  document.addEventListener('touchstart', tryAutoPlay);
+  document.addEventListener('click', tryAutoPlay, { once: false });
+  document.addEventListener('scroll', tryAutoPlay, { once: true });
 
   // ===== LIGHTBOX =====
   document.querySelectorAll('.gallery-item').forEach(item => {
